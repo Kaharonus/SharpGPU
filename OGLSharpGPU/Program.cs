@@ -12,7 +12,7 @@ namespace OGLSharpGPU {
 
         static void Main(string[] args) {
             
-           Window w = new Window(800, 480, "GPUSharp");
+           Window w = new Window(500, 500, "GPUSharp");
            //Window w = new Window();
            w.Run();
 
