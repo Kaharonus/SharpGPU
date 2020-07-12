@@ -3,8 +3,8 @@ using System.IO;
 using System.Text;
 using OpenToolkit.Graphics.OpenGL;
 
-namespace OGLSharpGPU {
-    public class Shader : IDisposable {
+namespace SharpGPU.OpenGL {
+     public class Shader : IDisposable {
         int Handle;
 
         public Shader(string vertexPath, string fragmentPath) {

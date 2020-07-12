@@ -1,15 +1,11 @@
-using System;
-using OpenToolkit.Core;
-using OpenToolkit.Windowing.Desktop;
-using OpenToolkit.Graphics;
-using OpenToolkit.Graphics.OpenGL4;
+using OpenToolkit.Graphics.OpenGL;
 using OpenToolkit.Mathematics;
 using OpenToolkit.Windowing.Common;
+using OpenToolkit.Windowing.Desktop;
 
-namespace OGLSharpGPU {
-    public class Window : GameWindow {
-
-        private GPU gpu;
+namespace SharpGPU.OpenGL {
+    public class OpenGLWindow : GameWindow {
+        public GPU Gpu { get; private set; }
 
         float[] vertices = {
             1.0f,  1.0f, 0.0f, 1.0f, 1.0f, // top right
@@ -35,9 +31,9 @@ namespace OGLSharpGPU {
         // For documentation on this, check Texture.cs
         private Texture texture;
 
-        public Window() : base(GameWindowSettings.Default, NativeWindowSettings.Default) { }
+        public OpenGLWindow() : base(GameWindowSettings.Default, NativeWindowSettings.Default) { }
 
-        public Window(int width, int height, string title) : base(new GameWindowSettings() {
+        public OpenGLWindow(int width, int height, string title) : base(new GameWindowSettings() {
             RenderFrequency = 60,
             UpdateFrequency = 60
         }, new NativeWindowSettings() {
@@ -48,16 +44,15 @@ namespace OGLSharpGPU {
 
         protected override void OnResize(ResizeEventArgs e) {
             GL.Viewport(0, 0, e.Width, e.Height);
-            gpu.ResizeFrameBuffer(e.Width,e.Height);
+            Gpu.ResizeFrameBuffer(e.Width,e.Height);
             base.OnResize(e);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args) {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             shader.Use();
-            gpu.DrawRandom();
             GL.DeleteTexture(texture.Handle);
-            texture = new Texture(gpu.FBWidth, gpu.FBHeight, gpu.GetFrameBufferAddr());
+            texture = new Texture(Gpu.FBWidth, Gpu.FBHeight, Gpu.GetFrameBufferAddr());
             GL.BindVertexArray(VertexArrayObject);
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
@@ -67,7 +62,7 @@ namespace OGLSharpGPU {
         
         
         protected override void OnLoad() {
-            gpu = GPU.Create(Size.X, Size.Y);
+            Gpu = GPU.Create(Size.X, Size.Y);
             
             GL.ClearColor(0f,0f,0f,1.0f);
             VertexBufferObject = GL.GenBuffer();
@@ -78,9 +73,9 @@ namespace OGLSharpGPU {
             ElementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
-            texture = new Texture(gpu.FBWidth, gpu.FBHeight, gpu.GetFrameBufferAddr());
+            texture = new Texture(Gpu.FBWidth, Gpu.FBHeight, Gpu.GetFrameBufferAddr());
 
-            shader = new Shader("shader.vert", "shader.frag");
+            shader = new Shader("OpenGL/shader.vert", "OpenGL/shader.frag");
             shader.Use();
             
             VertexArrayObject = GL.GenVertexArray();

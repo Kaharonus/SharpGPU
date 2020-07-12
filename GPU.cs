@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace OGLSharpGPU {
+namespace SharpGPU {
     public class GPU {
-        private byte[] frameBuffer;
+           private byte[] frameBuffer;
         private IntPtr fbAdd;
         private GCHandle fbHandle;
 
@@ -60,7 +60,15 @@ namespace OGLSharpGPU {
                 fbHandle.Free();
                 fbAdd = IntPtr.Zero;
             }
-        } 
+        }
+
+        public void DrawSolidColor(byte r, byte g, byte b) {
+            for (int x = 0; x < FBWidth; x++) {
+                for (int y = 0; y < FBHeight; y++) {
+                    SetPixelColor(x, y, r, g, b);
+                }
+            }
+        }
 
         public void DrawRandom() {
             var r = new Random();
