@@ -2,11 +2,11 @@ using System;
 using OpenToolkit.Graphics.OpenGL;
 
 namespace SharpGPU.OpenGL {
-    public class Texture {
+    public class OpenGlTexture {
         public readonly int Handle;
 
         // Create texture from path.
-        public Texture(int width, int height, IntPtr data)
+        public OpenGlTexture(int width, int height, IntPtr data)
         {
             Handle = GL.GenTexture();
 
@@ -26,8 +26,7 @@ namespace SharpGPU.OpenGL {
         // Multiple textures can be bound, if your shader needs more than just one.
         // If you want to do that, use GL.ActiveTexture to set which slot GL.BindTexture binds to.
         // The OpenGL standard requires that there be at least 16, but there can be more depending on your graphics card.
-        public void Use(TextureUnit unit = TextureUnit.Texture0)
-        {
+        public void Use(TextureUnit unit = TextureUnit.Texture0){
             GL.ActiveTexture(unit);
             GL.BindTexture(TextureTarget.Texture2D, Handle);
         }

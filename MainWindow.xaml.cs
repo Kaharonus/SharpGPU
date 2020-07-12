@@ -43,7 +43,8 @@ namespace SharpGPU {
         private void RenderWindow() {
             while (true) {
                 _openWindowSem.WaitOne();
-                _renderWindow = new OpenGLWindow(500, 500, "GPUSharp Preview Window");
+                GPU gpu = GPU.Create(500, 500, new DefaultGpuController());
+                _renderWindow = new OpenGLWindow(500, 500, "GPUSharp Preview Window", gpu);
                 _renderWindow.Run();
                 _renderWindow.Dispose();
                 _renderWindow = null;
@@ -64,7 +65,7 @@ namespace SharpGPU {
         }
 
         private void CreateNoiseClick(object sender, RoutedEventArgs args) {
-            _renderWindow.Gpu.DrawRandom();
+            _renderWindow.Gpu.DrawTest();
         }
 
         private void MainWindowClosing(object sender, CancelEventArgs args) {
@@ -76,7 +77,7 @@ namespace SharpGPU {
             if (args.Property.Name != "Value") {
                 return;
             }
-            _renderWindow.Gpu.DrawSolidColor((byte)RSlider.Value, (byte)GSlider.Value, (byte)BSlider.Value);
+            //_renderWindow.Gpu.DrawSolidColor((byte)RSlider.Value, (byte)GSlider.Value, (byte)BSlider.Value);
             
         }
     }

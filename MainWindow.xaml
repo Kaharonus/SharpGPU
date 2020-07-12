@@ -9,12 +9,9 @@
             <StackPanel Margin="10">
                 <TextBlock Margin="0,0,0,10" Text="OBJ Software Renderer" TextAlignment="Center" FontSize="16" />
                 <Button Margin="0,0,0,10" Content="Run OpenGL window" Click="OpenWindowClick" /> 
-                <Button Margin="0,0,0,10" Content="Generate random noise" Click="CreateNoiseClick" /> 
+                <Button Margin="0,0,0,10" Content="Draw test function" Click="CreateNoiseClick" /> 
                 <TextBlock Margin="0,0,0,10" Text="Select color to render:" />
-                <Slider Name="RSlider" Margin="0,0,0,10" Minimum="0" Maximum="255" Value="128" PropertyChanged="SliderMoved" />
-                <Slider Name="GSlider" Margin="0,0,0,10" Minimum="0" Maximum="255" Value="128" PropertyChanged="SliderMoved"/>
-                <Slider Name="BSlider" Margin="0,0,0,10" Minimum="0" Maximum="255" Value="128" PropertyChanged="SliderMoved"/>
-
+               
             </StackPanel>
         </Grid>
 </Window>

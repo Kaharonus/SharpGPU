@@ -1,3 +1,4 @@
+using System.Numerics;
 using OpenToolkit.Graphics.OpenGL;
 using OpenToolkit.Mathematics;
 using OpenToolkit.Windowing.Common;
@@ -26,20 +27,19 @@ namespace SharpGPU.OpenGL {
 
         private int VertexArrayObject;
 
-        private Shader shader;
+        private OpenGlShader _openGlShader;
 
         // For documentation on this, check Texture.cs
-        private Texture texture;
+        private OpenGlTexture _openGlTexture;
+        
+        public OpenGLWindow(int width, int height, string title, GPU gpu) : base(GameWindowSettings.Default,
+            new NativeWindowSettings() {
+                Size = new Vector2i(width, height),
+                Title = title,
+            }) {
+            this.Gpu = gpu;
+        }
 
-        public OpenGLWindow() : base(GameWindowSettings.Default, NativeWindowSettings.Default) { }
-
-        public OpenGLWindow(int width, int height, string title) : base(new GameWindowSettings() {
-            RenderFrequency = 60,
-            UpdateFrequency = 60
-        }, new NativeWindowSettings() {
-            Size = new Vector2i(width, height),
-            Title = title,
-        }) { }
         
 
         protected override void OnResize(ResizeEventArgs e) {
@@ -50,9 +50,10 @@ namespace SharpGPU.OpenGL {
 
         protected override void OnUpdateFrame(FrameEventArgs args) {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            shader.Use();
-            GL.DeleteTexture(texture.Handle);
-            texture = new Texture(Gpu.FBWidth, Gpu.FBHeight, Gpu.GetFrameBufferAddr());
+            Gpu.Controller.Draw(new Matrix4x4(), new Matrix4x4(), new Matrix4x4(), new Matrix4x4());
+            _openGlShader.Use();
+            GL.DeleteTexture(_openGlTexture.Handle);
+            _openGlTexture = new OpenGlTexture(Gpu.FbWidth, Gpu.FbHeight, Gpu.GetFrameBufferAddr());
             GL.BindVertexArray(VertexArrayObject);
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
@@ -62,7 +63,7 @@ namespace SharpGPU.OpenGL {
         
         
         protected override void OnLoad() {
-            Gpu = GPU.Create(Size.X, Size.Y);
+            Gpu.Controller.Init();
             
             GL.ClearColor(0f,0f,0f,1.0f);
             VertexBufferObject = GL.GenBuffer();
@@ -73,10 +74,10 @@ namespace SharpGPU.OpenGL {
             ElementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
-            texture = new Texture(Gpu.FBWidth, Gpu.FBHeight, Gpu.GetFrameBufferAddr());
+            _openGlTexture = new OpenGlTexture(Gpu.FbWidth, Gpu.FbHeight, Gpu.GetFrameBufferAddr());
 
-            shader = new Shader("OpenGL/shader.vert", "OpenGL/shader.frag");
-            shader.Use();
+            _openGlShader = new OpenGlShader("OpenGL/shader.vert", "OpenGL/shader.frag");
+            _openGlShader.Use();
             
             VertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(VertexArrayObject);
@@ -84,11 +85,11 @@ namespace SharpGPU.OpenGL {
             GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferObject);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
             
-            var vertexLocation = shader.GetAttribLocation("aPosition");
+            var vertexLocation = _openGlShader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(vertexLocation);
             GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
             
-            var texCoordLocation = shader.GetAttribLocation("aTexCoord");
+            var texCoordLocation = _openGlShader.GetAttribLocation("aTexCoord");
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
             
@@ -99,7 +100,7 @@ namespace SharpGPU.OpenGL {
         protected override void OnUnload() {
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.DeleteBuffer(VertexBufferObject);
-            shader.Dispose();
+            _openGlShader.Dispose();
             base.OnUnload();
         }
     }

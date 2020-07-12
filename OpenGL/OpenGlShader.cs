@@ -4,10 +4,10 @@ using System.Text;
 using OpenToolkit.Graphics.OpenGL;
 
 namespace SharpGPU.OpenGL {
-     public class Shader : IDisposable {
+     public class OpenGlShader : IDisposable {
         int Handle;
 
-        public Shader(string vertexPath, string fragmentPath) {
+        public OpenGlShader(string vertexPath, string fragmentPath) {
             int VertexShader, FragmentShader;
             string vertexShaderSource;
 
@@ -68,7 +68,7 @@ namespace SharpGPU.OpenGL {
             return GL.GetAttribLocation(Handle, attribName);
         }
         
-        ~Shader()
+        ~OpenGlShader()
         {
             GL.DeleteProgram(Handle);
         }
