@@ -1,11 +1,12 @@
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SharpGPU {
-    public class DefaultGpuController : GpuController{
-        
-
+    public class DefaultGpuController : GpuController {
+        private int _bufferId = 0;
+        private int _counter = 0;
         public override void VertexShader(ref OutVertex outVertex, InVertex inVertex, Uniforms uniforms) {
             if(inVertex.VertexId == 0)
                 outVertex.Position = new Vector4(-1,-1,0,1);
@@ -20,10 +21,14 @@ namespace SharpGPU {
         }
 
         public override void Init() {
-            
+            Buffer buffer = new Buffer(100);
+            buffer.WriteData(0, new List<int>() {0,1,2,3});
+            _bufferId = Gpu.AssignBuffer(buffer);
         }
 
         public override void Draw(Matrix4x4 proj, Matrix4x4 view, Matrix4x4 light, Matrix4x4 camera) {
+            _counter++;
+            Gpu.GetBuffer(_bufferId).WriteData(0, _counter);
         }
     }
 }

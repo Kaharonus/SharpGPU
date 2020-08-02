@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -7,11 +8,10 @@ using System.Threading.Tasks;
 namespace SharpGPU {
     public class GPU {
         private byte[] _frameBuffer;
-        private float[] _depthBuffer;
-        
         private IntPtr _fbAdd;
         private GCHandle _fbHandle;
         public GpuController Controller { get; private set; }
+        private Dictionary<int, Buffer> _buffers;
         
         public int FbHeight { get; private set; }
         public int FbWidth { get; private set; }
@@ -20,6 +20,7 @@ namespace SharpGPU {
         private GPU() {
             _fbAdd = IntPtr.Zero;
             _frameBuffer = new byte[4];
+            _buffers = new Dictionary<int, Buffer>();
         }
 
         ~GPU() {
@@ -70,6 +71,28 @@ namespace SharpGPU {
                 _fbAdd = IntPtr.Zero;
             }
         }
+
+
+        public int AssignBuffer(Buffer buffer) {
+            var key = 0;
+            while (_buffers.ContainsKey(key)) {
+                key++;
+            }
+            _buffers.Add(key, buffer);
+            return key;
+        }
+
+        public Buffer GetBuffer(int id) {
+            return !_buffers.ContainsKey(id) ? null : _buffers[id];
+        }
+
+        public void DeleteBuffer(int id) {
+            if(!_buffers.ContainsKey(id)) {
+                return;
+            }
+            _buffers.Remove(id);
+        }
+        
 
         public void DrawTest() {
             var widthInc = 128.0 / FbWidth;
